@@ -131,6 +131,10 @@ public class HateoasApplicationTests {
 		Assert.assertNull(createdWidget.getId());
 		Assert.assertNull(createdWidget.getName());
 		log.info(createdWidget.toString());
+		Widget verifyWidget = widgetRepo.findByName("Return On Create");
+		Assert.assertNotNull(verifyWidget);
+		Assert.assertEquals("Return On Create", verifyWidget.getName());
+		log.info("Verification Widget: " + verifyWidget.toString());		
 	}
 
 	// This should fail - on
@@ -154,6 +158,7 @@ public class HateoasApplicationTests {
 		log.info(returnWidget.toString());
 		Widget verifyWidget = widgetRepo.findByName("Updated Widget Name");
 		Assert.assertNotNull(verifyWidget);
+		Assert.assertEquals("Updated Widget Name", verifyWidget.getName());
 		log.info("Verification Widget: " + verifyWidget.toString());
 	}
 
