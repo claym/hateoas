@@ -38,18 +38,13 @@ import hateoas.repository.WidgetDetailRepository;
 import hateoas.repository.WidgetRepository;
 import lombok.extern.slf4j.Slf4j;
 
+/** This Test File is for making sure things are working correctly **/
+
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = HateoasApplication.class)
 @WebIntegrationTest(randomPort = true)
 public class HateoasApplicationTests {
-
-	private URI category1Location;
-	private URI category2Location;
-	private URI widget1Location;
-	private URI widget2Location;
-	private URI property1Location;
-	private URI property2Location;
 
 	@Autowired
 	WidgetRepository widgetRepo;
@@ -77,11 +72,6 @@ public class HateoasApplicationTests {
 	String baseUrl = "http://localhost:" + port;
 	String templateUrl = baseUrl + "/{path}";
 
-	/**
-	 * String widgetUrl = baseUrl + "/widget"; String categoryUrl = baseUrl +
-	 * "/category"; String detailUrl = baseUrl + "/widgetDetail"; String
-	 * propertyUrl = baseUrl + "/property";
-	 **/
 	@Before
 	public void setup() {
 		log.info("in setup");
@@ -98,7 +88,7 @@ public class HateoasApplicationTests {
 	}
 
 	@Test
-	public void exposedIdsWorking() {
+	public void exposedIds() {
 		Widget widget = new Widget("Expose Ids");
 		URI location = restTemplate.postForLocation(this.templateUrl, widget, "widget");
 		Widget repoWidget = widgetRepo.findByName("Expose Ids");
@@ -112,25 +102,59 @@ public class HateoasApplicationTests {
 		Assert.assertEquals(repoWidget.getId(), restWidget.getId());
 	}
 
-	// fails, should work
+	// should have multiple fails @
+	// Assert.assertNull(resource.getContent().getId());
+	@Test
+	public void exposedIdsInResponseEntity() {
+		Category cat1 = categoryRepo.save(new Category("Category 1"));
+		Assert.assertNotNull(cat1);
+		Category cat2 = categoryRepo.save(new Category("Category 2"));
+		Assert.assertNotNull(cat2);
+		Traverson traverson = new Traverson(URI.create(baseUrl), MediaTypes.HAL_JSON);
+		PagedResources<Resource<Category>> cats = traverson.follow("category", "self")
+				.toObject(new PagedResourcesType<Resource<Category>>() {
+				});
+		Assert.assertEquals(2, cats.getContent().size());
+		for (Resource<Category> resource : cats) {
+			Assert.assertNull(resource.getContent().getId());
+		}
+	}
+
+	// should fail on
+	// Assert.assertNull(createdWidget.getId());
+	// Assert.assertNull(createdWidget.getName());
 	@Test
 	public void returnBodyOnCreate() {
 		Widget widget = new Widget("Return On Create");
 		Widget createdWidget = restTemplate.postForObject(this.templateUrl, widget, Widget.class, "widget");
 		Assert.assertNotNull(createdWidget);
-		Assert.assertNotNull(createdWidget.getId());
+		Assert.assertNull(createdWidget.getId());
+		Assert.assertNull(createdWidget.getName());
 		log.info(createdWidget.toString());
 	}
 
-	public void FAILreturnBodyOnUpdate() {
+	// This should fail - on
+	// Assert.assertNull(returnWidget.getBody().getId());
+	// Assert.assertNull(returnWidget.getBody().getName());
+	@Test
+	public void returnBodyOnUpdate() {
 		Widget widget = new Widget("Return On Update");
-		URI location = restTemplate.postForLocation(this.templateUrl, widget, Widget.class, "widget");
+		URI location = restTemplate.postForLocation(this.templateUrl, widget, "widget");
 		Assert.assertNotNull(location);
 		Widget updateWidget = restTemplate.getForObject(location, Widget.class);
+		Assert.assertNotNull(updateWidget);
+		Assert.assertNotNull(updateWidget.getId());
 		updateWidget.setName("Updated Widget Name");
-		Widget returnWidget = restTemplate.postForObject(location, updateWidget, Widget.class);
-		Assert.assertNull(returnWidget.getId());
+		// Widget returnWidget = restTemplate.postForObject(location,
+		// updateWidget, Widget.class);
+		HttpEntity<Widget> httpEntity = new HttpEntity<Widget>(updateWidget);
+		ResponseEntity<Widget> returnWidget = restTemplate.exchange(location, HttpMethod.PUT, httpEntity, Widget.class);
+		Assert.assertNull(returnWidget.getBody().getId());
+		Assert.assertNull(returnWidget.getBody().getName());
 		log.info(returnWidget.toString());
+		Widget verifyWidget = widgetRepo.findByName("Updated Widget Name");
+		Assert.assertNotNull(verifyWidget);
+		log.info("Verification Widget: " + verifyWidget.toString());
 	}
 
 	protected void createAssociationViaPatch(String parentLink, String childLink) {
