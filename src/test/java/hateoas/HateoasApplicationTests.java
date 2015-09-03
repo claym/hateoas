@@ -117,19 +117,17 @@ public class HateoasApplicationTests {
 		Assert.assertEquals(2, cats.getContent().size());
 		for (Resource<Category> resource : cats) {
 			Assert.assertNull(resource.getContent().getId());
+			Assert.assertNotNull(resource.getContent().getName());
 		}
 	}
 
-	// should fail on
-	// Assert.assertNull(createdWidget.getId());
-	// Assert.assertNull(createdWidget.getName());
 	@Test
 	public void returnBodyOnCreate() {
 		Widget widget = new Widget("Return On Create");
 		Widget createdWidget = restTemplate.postForObject(this.templateUrl, widget, Widget.class, "widget");
 		Assert.assertNotNull(createdWidget);
-		Assert.assertNull(createdWidget.getId());
-		Assert.assertNull(createdWidget.getName());
+		Assert.assertNotNull(createdWidget.getId());
+		Assert.assertNotNull(createdWidget.getName());
 		log.info(createdWidget.toString());
 		Widget verifyWidget = widgetRepo.findByName("Return On Create");
 		Assert.assertNotNull(verifyWidget);
@@ -137,9 +135,6 @@ public class HateoasApplicationTests {
 		log.info("Verification Widget: " + verifyWidget.toString());		
 	}
 
-	// This should fail - on
-	// Assert.assertNull(returnWidget.getBody().getId());
-	// Assert.assertNull(returnWidget.getBody().getName());
 	@Test
 	public void returnBodyOnUpdate() {
 		Widget widget = new Widget("Return On Update");
@@ -153,8 +148,8 @@ public class HateoasApplicationTests {
 		// updateWidget, Widget.class);
 		HttpEntity<Widget> httpEntity = new HttpEntity<Widget>(updateWidget);
 		ResponseEntity<Widget> returnWidget = restTemplate.exchange(location, HttpMethod.PUT, httpEntity, Widget.class);
-		Assert.assertNull(returnWidget.getBody().getId());
-		Assert.assertNull(returnWidget.getBody().getName());
+		Assert.assertNotNull(returnWidget.getBody().getId());
+		Assert.assertNotNull(returnWidget.getBody().getName());
 		log.info(returnWidget.toString());
 		Widget verifyWidget = widgetRepo.findByName("Updated Widget Name");
 		Assert.assertNotNull(verifyWidget);
