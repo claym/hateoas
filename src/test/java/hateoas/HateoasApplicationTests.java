@@ -1,9 +1,6 @@
 package hateoas;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-
-import javax.annotation.meta.When;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -30,7 +27,6 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.collect.ImmutableMap;
 
 import hateoas.domain.Category;
-import hateoas.domain.Property;
 import hateoas.domain.Widget;
 import hateoas.repository.CategoryRepository;
 import hateoas.repository.PropertyRepository;
@@ -74,7 +70,6 @@ public class HateoasApplicationTests {
 
 	@Before
 	public void setup() {
-		log.info("in setup");
 		this.baseUrl = "http://localhost:" + port;
 		this.templateUrl = this.baseUrl + "/{path}";
 	}
