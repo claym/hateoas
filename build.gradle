@@ -26,7 +26,8 @@ apply plugin: 'io.spring.dependency-management'
 ext {
         springVersion  = '4.2.1.RELEASE'
         springDataVersion = 'Gosling-RELEASE'
-        springHateoasVersion = '0.19.0.RELEASE'
+        //springHateoasVersion = '0.19.0.RELEASE'
+        springHateoasVersion = '0.20.0.BUILD-SNAPSHOT'
 }
 
 jar {

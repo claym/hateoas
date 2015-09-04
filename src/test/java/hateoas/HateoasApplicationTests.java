@@ -3,7 +3,6 @@ package hateoas;
 import java.net.URI;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +21,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.collect.ImmutableMap;
@@ -87,14 +87,14 @@ public class HateoasApplicationTests {
 		Widget widget = new Widget("Expose Ids");
 		URI location = restTemplate.postForLocation(this.templateUrl, widget, "widget");
 		Widget repoWidget = widgetRepo.findByName("Expose Ids");
-		Assert.assertNotNull(repoWidget);
-		Assert.assertNotNull(repoWidget.getId());
+		Assert.notNull(repoWidget);
+		Assert.notNull(repoWidget.getId());
 		log.info("Repo widget: " + repoWidget);
 		Widget restWidget = restTemplate.getForObject(location, Widget.class);
 		log.info("Rest widget: " + restWidget);
-		Assert.assertNotNull(restWidget);
-		Assert.assertNotNull(restWidget.getId());
-		Assert.assertEquals(repoWidget.getId(), restWidget.getId());
+		Assert.notNull(restWidget);
+		Assert.notNull(restWidget.getId());
+		Assert.isTrue(repoWidget.getId().equals(restWidget.getId()));
 	}
 
 	// should have multiple fails @
@@ -102,17 +102,17 @@ public class HateoasApplicationTests {
 	@Test
 	public void exposedIdsInResponseEntity() {
 		Category cat1 = categoryRepo.save(new Category("Category 1"));
-		Assert.assertNotNull(cat1);
+		Assert.notNull(cat1);
 		Category cat2 = categoryRepo.save(new Category("Category 2"));
-		Assert.assertNotNull(cat2);
+		Assert.notNull(cat2);
 		Traverson traverson = new Traverson(URI.create(baseUrl), MediaTypes.HAL_JSON);
 		PagedResources<Resource<Category>> cats = traverson.follow("category", "self")
 				.toObject(new PagedResourcesType<Resource<Category>>() {
 				});
-		Assert.assertEquals(2, cats.getContent().size());
+		Assert.isTrue(2 == cats.getContent().size());
 		for (Resource<Category> resource : cats) {
-			Assert.assertNull(resource.getContent().getId());
-			Assert.assertNotNull(resource.getContent().getName());
+			Assert.notNull(resource.getContent().getId());
+			Assert.notNull(resource.getContent().getName());
 		}
 	}
 
@@ -120,35 +120,35 @@ public class HateoasApplicationTests {
 	public void returnBodyOnCreate() {
 		Widget widget = new Widget("Return On Create");
 		Widget createdWidget = restTemplate.postForObject(this.templateUrl, widget, Widget.class, "widget");
-		Assert.assertNotNull(createdWidget);
-		Assert.assertNotNull(createdWidget.getId());
-		Assert.assertNotNull(createdWidget.getName());
+		Assert.notNull(createdWidget);
+		Assert.notNull(createdWidget.getId());
+		Assert.notNull(createdWidget.getName());
 		log.info(createdWidget.toString());
 		Widget verifyWidget = widgetRepo.findByName("Return On Create");
-		Assert.assertNotNull(verifyWidget);
-		Assert.assertEquals("Return On Create", verifyWidget.getName());
-		log.info("Verification Widget: " + verifyWidget.toString());		
+		Assert.notNull(verifyWidget);
+		Assert.isTrue("Return On Create".equals(verifyWidget.getName()));
+		log.info("Verification Widget: " + verifyWidget.toString());
 	}
 
 	@Test
 	public void returnBodyOnUpdate() {
 		Widget widget = new Widget("Return On Update");
 		URI location = restTemplate.postForLocation(this.templateUrl, widget, "widget");
-		Assert.assertNotNull(location);
+		Assert.notNull(location);
 		Widget updateWidget = restTemplate.getForObject(location, Widget.class);
-		Assert.assertNotNull(updateWidget);
-		Assert.assertNotNull(updateWidget.getId());
+		Assert.notNull(updateWidget);
+		Assert.notNull(updateWidget.getId());
 		updateWidget.setName("Updated Widget Name");
 		// Widget returnWidget = restTemplate.postForObject(location,
 		// updateWidget, Widget.class);
 		HttpEntity<Widget> httpEntity = new HttpEntity<Widget>(updateWidget);
 		ResponseEntity<Widget> returnWidget = restTemplate.exchange(location, HttpMethod.PUT, httpEntity, Widget.class);
-		Assert.assertNotNull(returnWidget.getBody().getId());
-		Assert.assertNotNull(returnWidget.getBody().getName());
+		Assert.notNull(returnWidget.getBody().getId());
+		Assert.notNull(returnWidget.getBody().getName());
 		log.info(returnWidget.toString());
 		Widget verifyWidget = widgetRepo.findByName("Updated Widget Name");
-		Assert.assertNotNull(verifyWidget);
-		Assert.assertEquals("Updated Widget Name", verifyWidget.getName());
+		Assert.notNull(verifyWidget);
+		Assert.isTrue("Updated Widget Name".equals(verifyWidget.getName()));
 		log.info("Verification Widget: " + verifyWidget.toString());
 	}
 
