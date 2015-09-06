@@ -25,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import hateoas.domain.Widget;
@@ -156,6 +157,28 @@ public class LookupTests {
 		Assert.notNull(responseEntity.getBody().getContent());
 		Assert.isTrue(WIDGET_NAME.equals(responseEntity.getBody().getContent().getName()));
 		Assert.isTrue(lookupUrl.equals(responseEntity.getBody().getLink(Link.REL_SELF).getHref()));
+	}
+
+	@Test
+	public void restTemplateResource404() {
+		String WIDGET_NAME = "Response Entity Lookup";
+		Widget w = widgetRepo.save(new Widget(WIDGET_NAME));
+		String lookupUrl = baseUrl + "/widget/search/findByName?name=12345";
+		ParameterizedTypeReference<Resource<Widget>> resourceParameterizedTypeReference = new ParameterizedTypeReference<Resource<Widget>>() {
+		};
+		try {
+			ResponseEntity<Resource<Widget>> responseEntity = restTemplate.exchange(URI.create(lookupUrl), HttpMethod.GET,
+					null, resourceParameterizedTypeReference);
+		} catch (HttpClientErrorException ex) {
+			Assert.isTrue(ex.getStatusCode().value() == 404);
+		}
+		/**
+		Assert.notNull(responseEntity);
+		Assert.notNull(responseEntity.getBody());
+		Assert.notNull(responseEntity.getBody().getContent());
+		Assert.isTrue(WIDGET_NAME.equals(responseEntity.getBody().getContent().getName()));
+		Assert.isTrue(lookupUrl.equals(responseEntity.getBody().getLink(Link.REL_SELF).getHref()));
+		 **/
 	}
 
 	@Test
