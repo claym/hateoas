@@ -37,50 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 /** This Test File is for making sure things are working correctly **/
 
 @Slf4j
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = HateoasApplication.class)
-@WebIntegrationTest(randomPort = true)
-public class HateoasApplicationTests {
-
-	@Autowired
-	WidgetRepository widgetRepo;
-
-	@Autowired
-	WidgetDetailRepository detailRepo;
-
-	@Autowired
-	CategoryRepository categoryRepo;
-
-	@Autowired
-	PropertyRepository propertyRepo;
-
-	@Autowired
-	RestTemplate restTemplate;
-
-	@Test
-	public void contextLoads() {
-		log.info("in context load");
-	}
-
-	@Value("${local.server.port}")
-	int port;
-
-	String baseUrl = "http://localhost:" + port;
-	String templateUrl = baseUrl + "/{path}";
-
-	@Before
-	public void setup() {
-		this.baseUrl = "http://localhost:" + port;
-		this.templateUrl = this.baseUrl + "/{path}";
-	}
-
-	@After
-	public void tearDown() {
-		detailRepo.deleteAll();
-		widgetRepo.deleteAll();
-		categoryRepo.deleteAll();
-		propertyRepo.deleteAll();
-	}
+public class HateoasApplicationTests extends TestAbstract {
 
 	@Test
 	public void exposedIds() {
@@ -107,8 +64,7 @@ public class HateoasApplicationTests {
 		Assert.notNull(cat2);
 		Traverson traverson = new Traverson(URI.create(baseUrl), MediaTypes.HAL_JSON);
 		PagedResources<Resource<Category>> cats = traverson.follow("category", "self")
-				.toObject(new PagedResourcesType<Resource<Category>>() {
-				});
+				.toObject(new PagedResourcesType<Resource<Category>>() {});
 		Assert.isTrue(2 == cats.getContent().size());
 		for (Resource<Category> resource : cats) {
 			Assert.notNull(resource.getContent().getId());
@@ -161,8 +117,5 @@ public class HateoasApplicationTests {
 				ImmutableMap.of());
 	}
 
-	protected void createAssociationViaPut() {
-
-	}
 
 }

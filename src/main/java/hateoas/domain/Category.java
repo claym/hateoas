@@ -2,6 +2,7 @@ package hateoas.domain;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +23,7 @@ public class Category {
 	@Column
 	public String name;
 	
-	@OneToMany
+	@OneToMany(cascade=CascadeType.ALL)
 	public List<Widget> widgets;
 	
 	public Category() {

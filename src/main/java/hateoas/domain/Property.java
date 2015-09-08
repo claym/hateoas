@@ -2,11 +2,13 @@ package hateoas.domain;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import lombok.Data;
 
@@ -25,7 +27,7 @@ public class Property {
 	@Column
 	private String value;
 	
-	@ManyToMany
+	@ManyToMany(cascade=CascadeType.ALL)
 	private List<Widget> widgets;
 	
 	public Property() {

@@ -62,7 +62,7 @@ dependencies {
 
 	//compile( "org.springframework:spring-framework-bom:${springVersion}")
 
-    compile("org.springframework.hateoas:spring-hateoas:${springHateoasVersion}")
+    compile("org.springframework.hateoas:spring-hateoas:${springHateoasVersion}") { changing = true}
     
     compile("org.apache.httpcomponents:httpclient:4.5")
     compile("com.jayway.jsonpath:json-path:2.0.0")
